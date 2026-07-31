@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Xiao Jin — Operations Research that ships</title>
+<meta name="description" content="Xiao Jin — Senior Research Fellow, SIA-NUS Corporate Laboratory (NUS). Revenue-management and simulation-optimization research shipped as production systems.">
+<meta name="color-scheme" content="light dark">
+
+<!-- Favicon: teal tile with a rising yield curve, echoing the hero figure -->
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%230E6E78'/><path d='M5.5 24.5C11 24.5 12.5 7.5 26.5 7.5' stroke='%23fff' stroke-width='3.2' fill='none' stroke-linecap='round'/></svg>">
+
+<!-- Link preview -->
+<meta property="og:type" content="profile">
+<meta property="og:site_name" content="Xiao Jin">
+<meta property="og:title" content="Xiao Jin — Operations research that ships">
+<meta property="og:description" content="Xiao Jin — Senior Research Fellow, SIA-NUS Corporate Laboratory (NUS). Revenue management, pricing and simulation optimization, deployed in production.">
+<meta property="og:url" content="https://farkasle.github.io/">
+<meta property="og:image" content="https://farkasle.github.io/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Xiao Jin — Operations research that ships">
+<meta name="twitter:description" content="Xiao Jin — Senior Research Fellow, SIA-NUS Corporate Laboratory (NUS). Revenue management, pricing and simulation optimization, deployed in production.">
+<meta name="twitter:image" content="https://farkasle.github.io/og-image.png">
+<script>/* set theme before first paint to avoid FOUC */(function(){try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* ============================================================
+     INSTRUMENT READOUT — token system
+     ============================================================ */
+  :root{
+    --ink:#141A22;
+    --panel:#FFFFFF;
+    --paper:#F6F7F9;
+    --hairline:#DCE0E6;
+    --muted:#5B6672;
+    --signal:#0E6E78;
+    --signal-strong:#0A555E;
+    --signal-soft:rgba(14,110,120,0.08);
+    --on-signal:#FFFFFF;
+
+    --sans:'Instrument Sans', system-ui, 'Segoe UI', Roboto, Arial, sans-serif;
+    --mono:'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+    --rail-w:212px;
+    --maxw:880px;
+    --radius:4px;
+
+    /* one shared label gutter — every mono metadata column aligns to it */
+    --col-label:150px;
+    --col-gap:22px;
+
+    /* type scale — explicit integer steps, no half-pixels */
+    --fs-1:11px;   /* micro: kickers, tags, meta, units */
+    --fs-2:12px;   /* small mono: nav ticks, years, skill items */
+    --fs-3:13px;   /* small body: labels, timeline org/notes */
+    --fs-4:15px;   /* body copy, card body, list values */
+    --fs-5:17px;   /* card titles, lede max */
+    --fs-6:22px;   /* section title max */
+    --fs-7:33px;   /* readout figures, thesis min */
+    --fs-8:52px;   /* thesis max */
+
+    --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:24px;
+    --sp-6:32px; --sp-7:48px; --sp-8:64px; --sp-9:88px;
+
+    --progress:0;
+  }
+
+  :root[data-theme="dark"]{
+    --ink:#E7EBF1;
+    --panel:#141C26;
+    --paper:#0E141B;
+    --hairline:#27313D;
+    --muted:#9AA4B2;
+    --signal:#45C2D0;
+    --signal-strong:#69D4E0;
+    --signal-soft:rgba(69,194,208,0.14);
+    --on-signal:#07242A;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ink:#E7EBF1;
+      --panel:#141C26;
+      --paper:#0E141B;
+      --hairline:#27313D;
+      --muted:#9AA4B2;
+      --signal:#45C2D0;
+      --signal-strong:#69D4E0;
+      --signal-soft:rgba(69,194,208,0.14);
+      --on-signal:#07242A;
+    }
+  }
+
+  /* ============================================================
+     Reset / base
+     ============================================================ */
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; -webkit-text-size-adjust:100%; }
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--sans);
+    font-size:16px;
+    line-height:1.6;
+    font-weight:400;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+    display:block;
+    min-height:100vh;
+  }
+  h1,h2,h3,h4,p,ol,ul,figure{ margin:0; }
+  a{ color:inherit; }
+  .mono{ font-family:var(--mono); font-variant-numeric:tabular-nums; }
+  .visually-hidden{
+    position:absolute; width:1px; height:1px; padding:0; margin:-1px;
+    overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0;
+  }
+
+  /* Focus — base ring for all engines, refined by :focus-visible where supported */
+  a:focus, button:focus, .tick:focus{
+    outline:2px solid var(--signal);
+    outline-offset:2px;
+    border-radius:var(--radius);
+  }
+  @supports selector(:focus-visible){
+    a:focus:not(:focus-visible),
+    button:focus:not(:focus-visible),
+    .tick:focus:not(:focus-visible){ outline:none; }
+  }
+  .main:focus{ outline:none; }
+  .skip-link{
+    position:absolute; left:-999px; top:8px; z-index:200;
+    background:var(--signal); color:var(--on-signal);
+    padding:8px 14px; border-radius:var(--radius);
+    font-family:var(--mono); font-size:var(--fs-3); text-decoration:none;
+  }
+  .skip-link:focus{ left:8px; }
+
+  /* ============================================================
+     INSTRUMENT RAIL
+     ============================================================ */
+  .rail{
+    position:fixed; top:0; left:0;
+    width:var(--rail-w); height:100vh;
+    display:flex; flex-direction:column;
+    padding:26px 18px 22px;
+    border-right:1px solid var(--hairline);
+    background:var(--paper);
+    overflow-y:auto;
+    z-index:40;
+  }
+  .rail-brand{
+    text-decoration:none; display:flex; flex-direction:column; gap:3px;
+    margin-bottom:26px;
+  }
+  .brand-name{ font-weight:700; font-size:var(--fs-5); color:var(--ink); letter-spacing:-0.015em; }
+  .brand-role{ font-size:var(--fs-1); color:var(--muted); letter-spacing:.03em; }
+
+  .rail-index{ position:relative; margin-bottom:auto; }
+  .rail-index::before{
+    content:''; position:absolute; left:7px; top:2px; bottom:2px;
+    width:1px; background:var(--hairline);
+  }
+  .rail-progress-fill{
+    position:absolute; left:6px; top:2px; width:2px;
+    height:calc(var(--progress) * (100% - 4px));
+    background:var(--signal);
+    z-index:2;
+  }
+  .rail-list{ list-style:none; margin:0; padding:0; position:relative; z-index:3; }
+  .tick{
+    position:relative; display:flex; align-items:baseline; gap:10px;
+    padding:8px 6px 8px 24px; text-decoration:none; color:var(--muted);
+  }
+  .tick::before{
+    content:''; position:absolute; left:7px; top:calc(0.72em + 3px);
+    width:11px; height:1px; background:var(--hairline);
+    transition:background .12s ease, width .12s ease;
+  }
+  .tick-num{ font-size:var(--fs-1); font-weight:600; color:var(--muted); }
+  .tick-label{ font-size:var(--fs-2); }
+  .tick:hover{ color:var(--ink); }
+  .tick:hover::before{ background:var(--signal); width:15px; }
+  .tick.is-active{ color:var(--signal); }
+  .tick.is-active .tick-num{ color:var(--signal); }
+  .tick.is-active::before{ background:var(--signal); width:15px; }
+
+  .rail-meta{
+    margin-top:24px; display:flex; flex-direction:column; gap:6px;
+    font-size:var(--fs-1); color:var(--muted);
+  }
+  .rail-meta a{ color:var(--muted); text-decoration:none; word-break:break-all; }
+  .rail-meta a:hover{ color:var(--signal); }
+  .topbar-progress{ display:none; }
+
+  /* ============================================================
+     MAIN COLUMN
+     ============================================================ */
+  .main{ margin-left:var(--rail-w); min-width:0; }
+  .main-inner{ max-width:var(--maxw); margin:0 auto; padding:0 32px 0; }
+
+  .section{ padding:52px 0; }
+  .section:first-of-type{ padding-top:0; }
+  section[id]{ scroll-margin-top:28px; }
+
+  .section-head{
+    display:flex; align-items:baseline; gap:12px; flex-wrap:wrap;
+    margin-bottom:26px; padding-bottom:14px;
+    border-bottom:1px solid var(--hairline);
+  }
+  .section-index{ font-size:var(--fs-2); font-weight:600; color:var(--signal); letter-spacing:.06em; }
+  .section-title{ font-size:clamp(17px,2.4vw,22px); font-weight:600; letter-spacing:-0.01em; }
+  .section-note{ margin-left:auto; font-size:var(--fs-1); color:var(--muted); font-family:var(--mono); }
+
+  /* ============================================================
+     HERO
+     ============================================================ */
+  .hero{ padding:56px 0 44px; border-bottom:1px solid var(--hairline); }
+  .hero-grid{ display:grid; grid-template-columns:1fr; gap:34px; }
+  @media (min-width:820px){
+    .hero-grid{ grid-template-columns:1.3fr 0.9fr; align-items:start; gap:44px; }
+  }
+  .eyebrow{ font-size:var(--fs-2); color:var(--muted); letter-spacing:.03em; }
+  .hero-name{ color:var(--ink); font-weight:600; }
+  .eyebrow-sub{ font-size:var(--fs-1); color:var(--muted); letter-spacing:.03em; margin-top:4px; }
+  .thesis{
+    font-size:clamp(33px,6.2vw,52px); font-weight:700; line-height:1.03;
+    letter-spacing:-0.025em; color:var(--ink); margin:16px 0 20px;
+  }
+  .lede{
+    font-size:clamp(15px,1.9vw,17px); line-height:1.6; color:var(--ink);
+    max-width:52ch;
+  }
+  .lede b{ font-weight:600; }
+  .cred{ font-size:var(--fs-1); color:var(--muted); margin-top:18px; line-height:1.5; }
+  .hero-actions{
+    display:flex; flex-wrap:wrap; align-items:center; gap:12px 18px; margin-top:26px;
+  }
+  .btn-primary{
+    background:var(--signal); color:var(--on-signal);
+    padding:11px 18px; border-radius:var(--radius);
+    font-weight:600; font-size:var(--fs-4); text-decoration:none;
+    display:inline-flex; align-items:center; gap:8px;
+    transition:background .12s ease;
+  }
+  .btn-primary:hover{ background:var(--signal-strong); }
+  .btn-primary svg{ width:14px; height:14px; }
+  .btn-ghost{
+    background:transparent; color:var(--signal);
+    padding:10px 17px; border-radius:var(--radius);
+    border:1px solid var(--signal);
+    font-weight:600; font-size:var(--fs-4); text-decoration:none;
+    display:inline-flex; align-items:center; gap:8px;
+    transition:background .12s ease, color .12s ease;
+  }
+  .btn-ghost:hover{ background:var(--signal); color:var(--on-signal); }
+  .btn-ghost svg{ width:14px; height:14px; }
+  .link-inline{
+    color:var(--signal); text-decoration:none; font-weight:500; font-size:var(--fs-4);
+    border-bottom:1px solid transparent; transition:border-color .12s ease;
+    padding-bottom:1px;
+  }
+  .link-inline:hover{ border-bottom-color:var(--signal); }
+  .link-inline[aria-disabled="true"]{ color:var(--muted); cursor:default; }
+  .link-inline[aria-disabled="true"]:hover{ border-bottom-color:transparent; }
+
+  /* Hero figure — signature yield/convergence curve */
+  .hero-figure{ margin:0; display:flex; flex-direction:column; gap:10px; }
+  .figure-frame{
+    background:var(--panel); border:1px solid var(--hairline);
+    border-radius:var(--radius); padding:16px 18px 8px;
+  }
+  .yield-chart{ width:100%; height:auto; display:block; }
+  .grid line{ stroke:var(--hairline); stroke-width:1; }
+  .axis{ stroke:var(--hairline); stroke-width:1.25; }
+  .target{ stroke:var(--signal); stroke-width:1; stroke-dasharray:3 4; opacity:.4; }
+  #yieldGrad stop{ stop-color:var(--signal); }
+  .curve-area{ fill:url(#yieldGrad); opacity:0; animation:fadeIn .8s ease-out .55s forwards; }
+  .curve-line{
+    fill:none; stroke:var(--signal); stroke-width:2.5;
+    stroke-linecap:round; stroke-linejoin:round;
+    stroke-dasharray:1; stroke-dashoffset:1;
+    animation:draw 1.15s cubic-bezier(.22,.61,.36,1) .15s forwards;
+  }
+  .curve-halo{ fill:var(--signal); opacity:0; animation:haloIn .6s ease-out 1.18s forwards; }
+  .curve-dot{ fill:var(--signal); stroke:var(--panel); stroke-width:1.5; opacity:0; animation:fadeIn .45s ease-out 1.2s forwards; }
+  .chart-label{ fill:var(--muted); font-family:var(--mono); font-size:10px; letter-spacing:.02em; }
+  .chart-axis-title{ fill:var(--muted); font-family:var(--mono); font-size:9px; letter-spacing:.08em; }
+  .chart-opt{ fill:var(--signal); font-family:var(--mono); font-size:10px; font-weight:600; }
+  .figure-cap{ font-size:var(--fs-1); color:var(--muted); line-height:1.5; padding:0 2px; }
+  @keyframes draw{ to{ stroke-dashoffset:0; } }
+  @keyframes fadeIn{ to{ opacity:1; } }
+  @keyframes haloIn{ to{ opacity:.15; } }
+
+  /* ============================================================
+     01 CAPABILITIES
+     ============================================================ */
+  .pillars{
+    display:grid; grid-template-columns:1fr 1fr; gap:1px;
+    background:var(--hairline); border:1px solid var(--hairline);
+    border-radius:var(--radius); overflow:hidden;
+  }
+  .pillar{ background:var(--panel); padding:24px; }
+  .pillar-kicker{ font-family:var(--mono); font-size:var(--fs-1); font-weight:600; color:var(--signal); letter-spacing:.08em; }
+  .pillar-title{ font-size:var(--fs-5); font-weight:600; margin:8px 0 8px; letter-spacing:-0.01em; }
+  .pillar-body{ font-size:var(--fs-4); line-height:1.55; color:var(--ink); }
+
+  /* ============================================================
+     02 SELECTED IMPACT
+     ============================================================ */
+  .readouts{ display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+  .readout{
+    background:var(--panel); border:1px solid var(--hairline);
+    border-radius:var(--radius); padding:22px 20px;
+    display:flex; flex-direction:column; gap:9px;
+    transition:border-color .12s ease;
+  }
+  .readout:hover{ border-color:var(--signal); }
+  .readout-figure{
+    font-family:var(--mono); font-weight:600; font-variant-numeric:tabular-nums;
+    font-size:var(--fs-7); line-height:1; color:var(--signal);
+    letter-spacing:-0.01em;
+  }
+  .readout-delta{
+    font-family:var(--mono); font-size:var(--fs-2); color:var(--muted);
+    margin-top:-2px;
+  }
+  .readout-unit{
+    font-family:var(--mono); font-size:var(--fs-1); color:var(--muted);
+    text-transform:uppercase; letter-spacing:.05em;
+  }
+  .readout-label{ font-size:var(--fs-3); line-height:1.5; color:var(--ink); }
+  .readout-source{
+    font-family:var(--mono); font-size:var(--fs-1); color:var(--muted);
+    margin-top:auto; padding-top:12px; border-top:1px solid var(--hairline);
+  }
+  .impact-chips{ display:flex; flex-wrap:wrap; gap:10px; margin-top:16px; }
+  .chip-line{
+    font-family:var(--mono); font-size:var(--fs-1); color:var(--muted);
+    background:var(--panel); border:1px solid var(--hairline);
+    border-radius:999px; padding:6px 14px;
+  }
+
+  /* ============================================================
+     03 RESEARCH & DEPLOYED SYSTEMS
+     ============================================================ */
+  .systems{ display:flex; flex-direction:column; gap:14px; }
+  .system{
+    background:var(--panel); border:1px solid var(--hairline);
+    border-radius:var(--radius); padding:22px 24px;
+    transition:border-color .12s ease;
+  }
+  .system:hover{ border-color:var(--signal); }
+  .system-head{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:11px; }
+  .system-index{
+    font-family:var(--mono); font-weight:600; font-size:var(--fs-3); color:var(--signal);
+    width:26px; height:26px; flex:none;
+    display:inline-flex; align-items:center; justify-content:center;
+    border:1px solid var(--hairline); border-radius:var(--radius);
+  }
+  .system-title{ font-size:var(--fs-5); font-weight:600; letter-spacing:-0.01em; }
+  .system-chip{
+    margin-left:auto; font-family:var(--mono); font-size:var(--fs-1); color:var(--muted);
+    border:1px solid var(--hairline); border-radius:999px; padding:3px 11px;
+    text-transform:uppercase; letter-spacing:.04em; white-space:nowrap;
+  }
+  .system-body{ font-size:var(--fs-4); line-height:1.6; color:var(--ink); }
+  .tagrow{ list-style:none; display:flex; flex-wrap:wrap; gap:8px; margin:14px 0 0; padding:0; }
+  .tagrow li{
+    font-family:var(--mono); font-size:var(--fs-1); color:var(--muted);
+    background:var(--paper); border:1px solid var(--hairline);
+    border-radius:var(--radius); padding:3px 9px;
+  }
+
+  /* ============================================================
+     04 PUBLICATIONS
+     ============================================================ */
+  .pub-group{ margin-bottom:30px; }
+  .pub-group:last-child{ margin-bottom:0; }
+  .pub-group-title{
+    font-family:var(--mono); font-size:var(--fs-1); font-weight:600; color:var(--muted);
+    text-transform:uppercase; letter-spacing:.08em; margin-bottom:6px;
+  }
+  .pub-list{ list-style:none; margin:0; padding:0; }
+  .pub{
+    display:grid; grid-template-columns:var(--col-label) 1fr; gap:var(--col-gap);
+    padding:15px 0; border-top:1px solid var(--hairline);
+  }
+  .pub-year{ font-family:var(--mono); font-size:var(--fs-2); color:var(--signal); padding-top:1px; }
+  .pub-title{ font-size:var(--fs-4); font-weight:500; line-height:1.45; color:var(--ink); }
+  .pub-meta{ font-family:var(--mono); font-size:var(--fs-1); color:var(--muted); margin-top:4px; line-height:1.5; }
+  .pub-doi{
+    display:inline-block; font-family:var(--mono); font-size:var(--fs-1); color:var(--signal);
+    text-decoration:none; margin-top:6px; border-bottom:1px solid transparent;
+    word-break:break-word; transition:border-color .12s ease;
+  }
+  .pub-doi:hover{ border-bottom-color:var(--signal); }
+
+  /* ============================================================
+     05 EXPERIENCE / 06 EDUCATION  (timeline rows)
+     ============================================================ */
+  .rows{ display:flex; flex-direction:column; }
+  .row{
+    display:grid; grid-template-columns:var(--col-label) 1fr; gap:var(--col-gap);
+    padding:16px 0; border-top:1px solid var(--hairline);
+  }
+  .row:first-child{ border-top:none; }
+  .row-when{ font-family:var(--mono); font-size:var(--fs-3); color:var(--signal); padding-top:1px; }
+  .row-role{ font-size:var(--fs-4); font-weight:600; letter-spacing:-0.01em; }
+  .row-org{ font-size:var(--fs-3); color:var(--muted); margin-top:2px; }
+  .row-note{ font-size:var(--fs-3); color:var(--muted); margin-top:6px; line-height:1.5; }
+  .row-gpa{ font-family:var(--mono); font-size:var(--fs-1); color:var(--muted); margin-top:4px; }
+
+  /* ============================================================
+     07 TECHNICAL SKILLS
+     ============================================================ */
+  .skills{ display:flex; flex-direction:column; }
+  .skill-row{
+    display:grid; grid-template-columns:var(--col-label) 1fr; gap:var(--col-gap);
+    padding:15px 0; border-top:1px solid var(--hairline); align-items:start;
+  }
+  .skill-row:first-child{ border-top:none; }
+  .skill-cat{
+    font-family:var(--mono); font-size:var(--fs-1); color:var(--muted);
+    text-transform:uppercase; letter-spacing:.04em; padding-top:5px;
+  }
+  .skill-items{ display:flex; flex-wrap:wrap; gap:8px; }
+  .skill-items span{
+    font-family:var(--mono); font-size:var(--fs-2); color:var(--ink);
+    background:var(--panel); border:1px solid var(--hairline);
+    border-radius:var(--radius); padding:4px 10px;
+  }
+
+  /* ============================================================
+     08 SPEAKING & SERVICE
+     ============================================================ */
+  .service-list{ list-style:none; margin:0; padding:0; }
+  .service-item{
+    display:grid; grid-template-columns:var(--col-label) 1fr; gap:var(--col-gap);
+    padding:15px 0; border-top:1px solid var(--hairline); align-items:baseline;
+  }
+  .service-item:first-child{ border-top:none; }
+  .service-tag{
+    font-family:var(--mono); font-size:var(--fs-1); color:var(--signal);
+    text-transform:uppercase; letter-spacing:.05em;
+  }
+  .service-text{ font-size:var(--fs-4); color:var(--ink); line-height:1.5; }
+  .service-text .sub{ color:var(--muted); }
+
+  /* ============================================================
+     FOOTER
+     ============================================================ */
+  .site-footer{ margin-left:var(--rail-w); margin-top:56px; }
+  .footer-inner{
+    max-width:var(--maxw); margin:0 auto; padding:36px 32px 60px;
+    border-top:1px solid var(--hairline);
+    display:flex; flex-wrap:wrap; gap:20px 28px; align-items:baseline; justify-content:space-between;
+  }
+  .footer-id .f-name{ font-weight:700; font-size:var(--fs-4); letter-spacing:-0.01em; }
+  .footer-id .f-role{ font-family:var(--mono); font-size:var(--fs-1); color:var(--muted); margin-top:4px; }
+  .footer-links{ display:flex; flex-wrap:wrap; gap:8px 18px; align-items:center; }
+  .footer-links a{ color:var(--signal); text-decoration:none; font-size:var(--fs-3); font-weight:500; border-bottom:1px solid transparent; transition:border-color .12s ease; }
+  .footer-links a:hover{ border-bottom-color:var(--signal); }
+  .footer-links a[aria-disabled="true"]{ color:var(--muted); cursor:default; }
+  .footer-links a[aria-disabled="true"]:hover{ border-bottom-color:transparent; }
+  .footer-links .sep{ color:var(--hairline); }
+  .theme-toggle{
+    font-family:var(--mono); font-size:var(--fs-2); color:var(--muted);
+    background:var(--panel); border:1px solid var(--hairline);
+    border-radius:999px; padding:6px 14px; cursor:pointer;
+    transition:border-color .12s ease, color .12s ease;
+  }
+  .theme-toggle:hover{ border-color:var(--signal); color:var(--signal); }
+
+  /* ============================================================
+     RESPONSIVE — rail collapses to sticky top bar < 900px
+     ============================================================ */
+  @media (max-width:899px){
+    .rail{
+      position:sticky; top:0; left:0; width:auto; height:auto;
+      flex-direction:row; align-items:center; gap:16px;
+      padding:10px 16px; overflow-x:auto; overflow-y:hidden;
+      border-right:none; border-bottom:1px solid var(--hairline);
+      -webkit-overflow-scrolling:touch;
+    }
+    .rail-brand{ margin-bottom:0; flex:none; }
+    .brand-role{ display:none; }
+    .rail-index{ margin-bottom:0; }
+    .rail-index::before, .rail-progress-fill{ display:none; }
+    .rail-list{ display:flex; gap:0; }
+    .tick{ padding:6px 12px; white-space:nowrap; }
+    .tick::before{ display:none; }
+    .tick.is-active{ border-bottom:2px solid var(--signal); }
+    .rail-meta{ display:none; }
+    .topbar-progress{
+      display:block; position:absolute; left:0; bottom:0; height:2px;
+      width:calc(var(--progress) * 100%); background:var(--signal);
+    }
+    .main{ margin-left:0; }
+    .main-inner{ padding:0 20px; }
+    .site-footer{ margin-left:0; }
+    .footer-inner{ padding:36px 20px 60px; }
+    section[id]{ scroll-margin-top:72px; }
+  }
+
+  @media (max-width:640px){
+    .hero-grid{ gap:28px; }
+    .pillars{ grid-template-columns:1fr; }
+    .readouts{ grid-template-columns:1fr; }
+    .row{ grid-template-columns:1fr; gap:4px; }
+    .service-item{ grid-template-columns:1fr; gap:4px; }
+    .skill-row{ grid-template-columns:1fr; gap:8px; }
+    .skill-cat{ padding-top:0; }
+    .pub{ grid-template-columns:1fr; gap:2px; }
+    .pub-year{ padding-top:0; }
+    .section-note{ margin-left:0; flex-basis:100%; }
+  }
+  @media (max-width:380px){
+    .main-inner{ padding:0 16px; }
+    .footer-inner{ padding-left:16px; padding-right:16px; }
+    .system{ padding:18px; }
+    .pillar{ padding:18px; }
+  }
+
+  /* ---- collapsed publication group ---- */
+  .pub-collapse > summary{
+    cursor:pointer; list-style:none; display:flex; align-items:center; gap:9px;
+    -webkit-user-select:none; user-select:none; margin-bottom:0;
+    transition:color .12s ease;
+  }
+  .pub-collapse > summary::-webkit-details-marker{ display:none; }
+  .pub-collapse > summary::after{
+    content:''; width:6px; height:6px; margin-left:2px;
+    border-right:1.5px solid currentColor; border-bottom:1.5px solid currentColor;
+    transform:rotate(45deg) translate(-2px,-2px); transition:transform .15s ease;
+  }
+  .pub-collapse[open] > summary::after{ transform:rotate(225deg) translate(-1px,-1px); }
+  .pub-collapse > summary:hover{ color:var(--signal); }
+  .pub-count{
+    font-family:var(--mono); font-size:var(--fs-1); font-weight:600; color:var(--signal);
+    border:1px solid var(--hairline); border-radius:3px; padding:1px 6px; letter-spacing:0;
+  }
+  .pub-collapse .pub-list{ margin-top:11px; }
+
+  /* ---- CONE animations ---- */
+  .cone{ margin:0 0 30px; }
+  .cone-title{
+    font-size:var(--fs-5); font-weight:600; color:var(--ink); margin-bottom:6px;
+  }
+  .cone-body{ color:var(--muted); max-width:72ch; margin-bottom:16px; }
+  .cone-grid{ display:grid; gap:20px; }
+  .cone-item{ min-width:0; }
+  .cone-play{
+    display:block; width:100%; padding:0; border:1px solid var(--hairline);
+    border-radius:var(--radius); overflow:hidden; background:var(--panel);
+    cursor:pointer; position:relative; font:inherit; color:inherit;
+    transition:border-color .12s ease;
+  }
+  .cone-play:hover{ border-color:var(--signal); }
+  .cone-play:focus-visible{ outline:2px solid var(--signal); outline-offset:2px; }
+  .cone-play img{ display:block; width:100%; height:auto; }
+  .cone-badge{
+    position:absolute; left:12px; bottom:12px;
+    background:var(--signal); color:var(--on-signal);
+    font-size:var(--fs-1); font-weight:600; padding:5px 11px;
+    border-radius:var(--radius); letter-spacing:.02em;
+  }
+  .cone-play.is-playing{ cursor:default; }
+  .cone-play.is-playing .cone-badge{ display:none; }
+  .cone-label{ font-size:var(--fs-3); color:var(--muted); margin-top:9px; }
+  .cone-label b{ color:var(--ink); font-weight:600; }
+
+  /* ============================================================
+     Reduced motion
+     ============================================================ */
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior:auto; }
+    *, *::before, *::after{
+      animation-duration:.001ms !important;
+      animation-iteration-count:1 !important;
+      transition-duration:.001ms !important;
+    }
+    .curve-line{ stroke-dashoffset:0 !important; }
+    .curve-area{ opacity:1 !important; }
+    .curve-dot{ opacity:1 !important; }
+    .curve-halo{ opacity:.15 !important; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<!-- ================= INSTRUMENT RAIL ================= -->
+<nav class="rail" aria-label="Section index">
+  <a class="rail-brand" href="#top">
+    <span class="brand-name">Xiao Jin</span>
+    <span class="brand-role mono">RM · Simulation · Production ML</span>
+  </a>
+  <div class="rail-index">
+    <span class="rail-progress-fill" aria-hidden="true"></span>
+    <ol class="rail-list">
+      <li><a class="tick" href="#capabilities"><span class="tick-num mono">01</span><span class="tick-label">Capabilities</span></a></li>
+      <li><a class="tick" href="#impact"><span class="tick-num mono">02</span><span class="tick-label">Impact</span></a></li>
+      <li><a class="tick" href="#systems"><span class="tick-num mono">03</span><span class="tick-label">Systems</span></a></li>
+      <li><a class="tick" href="#publications"><span class="tick-num mono">04</span><span class="tick-label">Publications</span></a></li>
+      <li><a class="tick" href="#experience"><span class="tick-num mono">05</span><span class="tick-label">Experience</span></a></li>
+      <li><a class="tick" href="#education"><span class="tick-num mono">06</span><span class="tick-label">Education</span></a></li>
+      <li><a class="tick" href="#skills"><span class="tick-num mono">07</span><span class="tick-label">Skills</span></a></li>
+      <li><a class="tick" href="#service"><span class="tick-num mono">08</span><span class="tick-label">Service</span></a></li>
+    </ol>
+  </div>
+  <div class="rail-meta mono">
+    <a href="mailto:xiao.j@nus.edu.sg">xiao.j@nus.edu.sg</a>
+    <span>Singapore</span>
+  </div>
+  <span class="topbar-progress" aria-hidden="true"></span>
+</nav>
+
+<!-- ================= MAIN ================= -->
+<main class="main" id="main" tabindex="-1">
+  <div class="main-inner">
+
+    <!-- ===== HERO ===== -->
+    <header class="hero" id="top">
+      <div class="hero-grid">
+        <div class="hero-head">
+          <p class="eyebrow mono"><span class="hero-name">Xiao Jin</span> · Senior Research Fellow</p>
+          <p class="eyebrow-sub mono">SIA–NUS Corporate Laboratory · National University of Singapore</p>
+          <h1 class="thesis"><span class="visually-hidden">Xiao Jin — </span>Operations research that ships.</h1>
+          <p class="lede">I turn revenue-management and simulation-optimization research into systems that run in production — <b>checked-baggage pricing live at Scoot</b>, <b>simulation-optimization rostering live at NUHS</b>, and a <b>revenue-prediction platform used inside Singapore Airlines</b>.</p>
+          <p class="cred mono">Ph.D., Industrial Systems Engineering &amp; Management · National University of Singapore · Based in Singapore</p>
+          <div class="hero-actions">
+            <a class="btn-primary" href="cv-academic.pdf" download>
+              <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v9m0 0 3.2-3.2M8 10 4.8 6.8M2.5 13.5h11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Academic CV
+            </a>
+            <a class="btn-ghost" href="cv-industry.pdf" download>
+              <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v9m0 0 3.2-3.2M8 10 4.8 6.8M2.5 13.5h11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Industry CV
+            </a>
+            <a class="link-inline" href="mailto:xiao.j@nus.edu.sg">xiao.j@nus.edu.sg</a>
+            <a class="link-inline" href="https://scholar.google.com/citations?user=NffLyjoAAAAJ" rel="me noopener" target="_blank">Google Scholar</a>
+            <a class="link-inline" href="https://www.linkedin.com/in/%E6%9E%AD-%E9%87%91-b54684246/" rel="me noopener" target="_blank">LinkedIn</a>
+          </div>
+        </div>
+
+        <!-- SIGNATURE: airline selling-horizon yield / convergence curve (illustrative) -->
+        <figure class="hero-figure">
+          <div class="figure-frame">
+            <svg class="yield-chart" viewBox="0 0 520 340" role="img" aria-labelledby="figTitle figDesc" preserveAspectRatio="xMidYMid meet">
+              <title id="figTitle">Illustrative cumulative yield across the airline selling horizon</title>
+              <desc id="figDesc">An illustrative booking curve that enters low at T minus 365 days from departure, rises convexly through the selling horizon, and settles onto its optimum near departure, marked with a single point. Not measured data.</desc>
+              <defs>
+                <linearGradient id="yieldGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stop-opacity="0.16"></stop>
+                  <stop offset="1" stop-opacity="0"></stop>
+                </linearGradient>
+              </defs>
+              <!-- faint measurement grid -->
+              <g class="grid" aria-hidden="true">
+                <line x1="70" y1="60"  x2="486" y2="60"></line>
+                <line x1="70" y1="113" x2="486" y2="113"></line>
+                <line x1="70" y1="166" x2="486" y2="166"></line>
+                <line x1="70" y1="219" x2="486" y2="219"></line>
+                <line x1="174" y1="60" x2="174" y2="272"></line>
+                <line x1="278" y1="60" x2="278" y2="272"></line>
+                <line x1="382" y1="60" x2="382" y2="272"></line>
+                <line x1="486" y1="60" x2="486" y2="272"></line>
+              </g>
+              <!-- axes -->
+              <line class="axis" x1="70" y1="272" x2="486" y2="272"></line>
+              <line class="axis" x1="70" y1="60"  x2="70"  y2="272"></line>
+              <!-- target optimum line -->
+              <line class="target" x1="70" y1="78" x2="486" y2="78"></line>
+              <!-- area under trace -->
+              <path class="curve-area" d="M70 250 C130 246 168 240 214 220 C262 199 296 158 336 122 C380 84 436 80 486 78 L486 272 L70 272 Z"></path>
+              <!-- the data trace -->
+              <path class="curve-line" pathLength="1" d="M70 250 C130 246 168 240 214 220 C262 199 296 158 336 122 C380 84 436 80 486 78"></path>
+              <!-- settled optimum -->
+              <circle class="curve-halo" cx="486" cy="78" r="9"></circle>
+              <circle class="curve-dot"  cx="486" cy="78" r="4.5"></circle>
+              <text class="chart-opt" x="478" y="66" text-anchor="end">optimum</text>
+              <!-- axis labels -->
+              <text class="chart-label" x="70"  y="288" text-anchor="middle">T-365</text>
+              <text class="chart-label" x="174" y="288" text-anchor="middle">T-180</text>
+              <text class="chart-label" x="278" y="288" text-anchor="middle">T-90</text>
+              <text class="chart-label" x="382" y="288" text-anchor="middle">T-30</text>
+              <text class="chart-label" x="486" y="288" text-anchor="middle">T-0</text>
+              <text class="chart-axis-title" x="278" y="312" text-anchor="middle">SELLING HORIZON · DAYS TO DEPARTURE</text>
+              <text class="chart-axis-title" x="20" y="166" text-anchor="middle" transform="rotate(-90 20 166)">CUMULATIVE YIELD</text>
+            </svg>
+          </div>
+          <figcaption class="figure-cap mono">Illustrative — cumulative yield across the selling horizon, converging toward optimum near departure.</figcaption>
+        </figure>
+      </div>
+    </header>
+
+    <!-- ===== 01 CAPABILITIES ===== -->
+    <section class="section" id="capabilities" aria-labelledby="cap-h">
+      <div class="section-head">
+        <span class="section-index mono">01</span>
+        <h2 class="section-title" id="cap-h">Capabilities</h2>
+        <span class="section-note">4 areas</span>
+      </div>
+      <div class="pillars">
+        <article class="pillar">
+          <p class="pillar-kicker">PRICING</p>
+          <h3 class="pillar-title">Revenue Management &amp; Pricing</h3>
+          <p class="pillar-body">Feature-based and rational-inattention ancillary pricing, dynamic and data-driven pricing, and deep choice modelling for airline demand.</p>
+        </article>
+        <article class="pillar">
+          <p class="pillar-kicker">SIMULATION</p>
+          <h3 class="pillar-title">Simulation-based Optimization</h3>
+          <p class="pillar-body">Large-scale discrete-event simulation and prescriptive / contextual optimization; optimal computing budget allocation and simulation analytics.</p>
+        </article>
+        <article class="pillar">
+          <p class="pillar-kicker">DEEP LEARNING</p>
+          <h3 class="pillar-title">Deep Learning for Choice Modelling</h3>
+          <p class="pillar-body">Transformer and deep-neural-network choice models trained on customer browsing and transaction data to predict purchase behaviour.</p>
+        </article>
+        <article class="pillar">
+          <p class="pillar-kicker">DELIVERY</p>
+          <h3 class="pillar-title">Production ML &amp; Full-stack Delivery</h3>
+          <p class="pillar-body">Ships end-to-end systems (Django + React, PyTorch, Gurobi / CPLEX), orchestrated with agentic AI coding (Claude Code), across concurrent industry projects.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- ===== 02 SELECTED IMPACT ===== -->
+    <section class="section" id="impact" aria-labelledby="impact-h">
+      <div class="section-head">
+        <span class="section-index mono">02</span>
+        <h2 class="section-title" id="impact-h">Selected Impact</h2>
+        <span class="section-note">3 metrics</span>
+      </div>
+      <div class="readouts">
+        <article class="readout">
+          <p class="readout-figure">~8%</p>
+          <p class="readout-delta mono">p &lt; 0.01</p>
+          <p class="readout-unit">checked-baggage revenue</p>
+          <p class="readout-label">Rational-inattention pricing algorithm, designed and led. Measured in a randomized field deployment against the incumbent rule — posted prices fell on average while revenue rose.</p>
+          <p class="readout-source">Live in production at Scoot · 1.41M booking sessions</p>
+        </article>
+        <article class="readout">
+          <p class="readout-figure">4%</p>
+          <p class="readout-delta mono">↓ from 6%</p>
+          <p class="readout-unit">call abandonment</p>
+          <p class="readout-label">Simulation-optimization rostering model for monthly staff planning.</p>
+          <p class="readout-source">In live use · NUHS JMC call centre</p>
+        </article>
+        <article class="readout">
+          <p class="readout-figure">~18–21%</p>
+          <p class="readout-unit">projected cost savings</p>
+          <p class="readout-label">Simulation and data-driven forecasting for SKU repositioning across warehouses.</p>
+          <p class="readout-source">Simulation study · Kuehne+Nagel</p>
+        </article>
+      </div>
+      <div class="impact-chips">
+        <span class="chip-line">1-week → 1-year horizon · SIA Revenue Prediction Platform</span>
+        <span class="chip-line">Peer-reviewed · INFORMS Journal on Computing</span>
+        <span class="chip-line">First author · under review, Operations Research</span>
+      </div>
+    </section>
+
+    <!-- ===== 03 RESEARCH & DEPLOYED SYSTEMS ===== -->
+    <section class="section" id="systems" aria-labelledby="systems-h">
+      <div class="section-head">
+        <span class="section-index mono">03</span>
+        <h2 class="section-title" id="systems-h">Research &amp; Deployed Systems</h2>
+        <span class="section-note">6 projects</span>
+      </div>
+      <div class="systems">
+
+        <article class="system">
+          <div class="system-head">
+            <span class="system-index mono">A</span>
+            <h3 class="system-title">SIA Revenue Prediction Platform</h3>
+            <span class="system-chip">Lead researcher</span>
+          </div>
+          <p class="system-body">End-to-end simulation platform forecasting revenue over 1-week to 1-year selling horizons under competitor pricing, RM policy, and network-level capacity competition. Trained and deployed a Transformer-based deep choice model on customer browsing and transaction data; built the full-stack SIA Booking Simulator (Django + React, MongoDB, Celery) end-to-end with AI-assisted development. Adopted by SIA practitioners to validate pricing and RM decisions before deployment.</p>
+          <ul class="tagrow mono">
+            <li>Deep choice model</li><li>Simulation</li><li>Django + React</li><li>Deployed at SIA</li>
+          </ul>
+        </article>
+
+        <article class="system">
+          <div class="system-head">
+            <span class="system-index mono">B</span>
+            <h3 class="system-title">Scoot Checked-Baggage Ancillary Pricing</h3>
+            <span class="system-chip">Project lead</span>
+          </div>
+          <p class="system-body">Ran randomized price experiments across 1.41M booking sessions and five baggage tiers, established through reduced-form analysis that substitution is sharply heterogeneous, and built a rational-inattention demand model that prices the whole tier ladder from a handful of interpretable parameters — calibrated by linear programming so it scales to thousands of sparse segments. Randomized field deployment against the incumbent rule raised baggage revenue ~8% (p &lt; 0.01), with the recommended price distribution first-order stochastically dominating the incumbent: posted prices fall on average even as revenue rises. Now running in production at Scoot; first-authored write-up under review at Operations Research.</p>
+          <ul class="tagrow mono">
+            <li>Revenue management</li><li>Rational inattention</li><li>Randomized field experiment</li><li>In production</li>
+          </ul>
+        </article>
+
+        <article class="system">
+          <div class="system-head">
+            <span class="system-index mono">C</span>
+            <h3 class="system-title">NUHS JMC Call-centre Rostering</h3>
+            <span class="system-chip">Project lead</span>
+          </div>
+          <p class="system-body">Discrete-event simulation and optimization model for agent rostering that cut the call-abandonment rate from 6% to 4%; now in live use for monthly staff planning. The method — Relocate–Certify–Repair for non-resetting queues, with an exact finite-sample reliability certificate — meets the abandonment target in 565 of 570 weekday-period cells on fresh replications.</p>
+          <ul class="tagrow mono">
+            <li>Discrete-event simulation</li><li>Optimization</li><li>Deployed</li>
+          </ul>
+        </article>
+
+        <article class="system">
+          <div class="system-head">
+            <span class="system-index mono">D</span>
+            <h3 class="system-title">National Heart Centre Singapore — Appointment Scheduling</h3>
+            <span class="system-chip">Project lead</span>
+          </div>
+          <p class="system-body">Appointment-scheduling optimization under demand uncertainty to uphold the centre's lead-day promise — booking patients within the committed lead time while absorbing demand variability.</p>
+          <ul class="tagrow mono">
+            <li>Scheduling under uncertainty</li><li>Healthcare operations</li>
+          </ul>
+        </article>
+
+        <article class="system">
+          <div class="system-head">
+            <span class="system-index mono">E</span>
+            <h3 class="system-title">Tuas Port Finger 1 Capacity Study</h3>
+            <span class="system-chip">Project lead</span>
+          </div>
+          <p class="system-body">Full-scale discrete-event simulation with realistic ship arrivals, container-profile distributions, and crane / AGV dynamics to estimate annual TEU throughput under candidate layouts; findings endorsed by the project stakeholder.</p>
+          <ul class="tagrow mono">
+            <li>Maritime</li><li>Discrete-event simulation</li><li>Capacity planning</li>
+          </ul>
+        </article>
+
+        <article class="system">
+          <div class="system-head">
+            <span class="system-index mono">F</span>
+            <h3 class="system-title">Kuehne+Nagel SKU Repositioning</h3>
+            <span class="system-chip">Core researcher</span>
+          </div>
+          <p class="system-body">Simulation and simulation-based optimization backbone combined with data-driven demand forecasting for inventory repositioning across warehouses; ~18–21% projected cost reduction in simulation studies.</p>
+          <ul class="tagrow mono">
+            <li>Supply chain</li><li>Simulation optimization</li><li>Forecasting</li>
+          </ul>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- ===== 04 PUBLICATIONS ===== -->
+    <section class="section" id="publications" aria-labelledby="pub-h">
+      <div class="section-head">
+        <span class="section-index mono">04</span>
+        <h2 class="section-title" id="pub-h">Publications</h2>
+      </div>
+
+      <figure class="cone">
+        <figcaption>
+          <p class="cone-title">CONE in motion &mdash; the method behind the <i>INFORMS Journal on Computing</i> paper</p>
+          <p class="cone-body">Both panels run CONE against uniform sampling on an identical budget, problem and surrogate &mdash; the only difference is where each buys its observations. Noise here is deliberately concentrated where the top two alternatives are nearly tied, which is the regime the method is built for. Watch where the observations go: CONE spends on the boundaries where the best decision changes and leaves the interior of each region thinly sampled, so it reaches a given accuracy on a smaller budget. <a class="link-inline" href="https://doi.org/10.1287/ijoc.2025.1134">DOI 10.1287/ijoc.2025.1134</a></p>
+        </figcaption>
+
+        <div class="cone-grid">
+          <div class="cone-item">
+            <button class="cone-play" type="button" data-anim="cone-2d.webp">
+              <img src="cone-2d-poster.webp" alt="Two-dimensional context space: CONE's samples cluster along the boundaries between regions where different decisions are optimal, while uniform sampling spreads evenly. CONE's estimated decision map is closer to the truth." width="1100" height="536" loading="lazy" decoding="async">
+              <span class="cone-badge mono">&#9654;&nbsp; Play animation &middot; 1.5&nbsp;MB</span>
+            </button>
+            <p class="cone-label"><b>Two-dimensional context.</b> The acceptance-probability panel is the clearest evidence &mdash; CONE&rsquo;s sampling density traces the true decision boundaries. On this run its decision map is 5.0% wrong against uniform sampling&rsquo;s 7.2%; averaged over 20 replications the two finish within noise of each other (94.8% against 94.3%), having spent the budget very differently to get there.</p>
+          </div>
+
+          <div class="cone-item">
+            <button class="cone-play" type="button" data-anim="cone-1d.webp">
+              <img src="cone-1d-poster.webp" alt="One-dimensional context space: response surfaces for three alternatives, the observations CONE purchased, the estimated decision map against the truth, and the correct-decision rate rising with simulation budget." width="1100" height="624" loading="lazy" decoding="async">
+              <span class="cone-badge mono">&#9654;&nbsp; Play animation &middot; 1.4&nbsp;MB</span>
+            </button>
+            <p class="cone-label"><b>One-dimensional context.</b> Response surfaces, the sampling weight CONE assigns across the state space, and the decision map it recovers. At a quarter of the budget CONE is 75.0% correct against uniform sampling&rsquo;s 62.2% (8 replications, gap 2&sigma; clear); by full budget both converge to about 91%.</p>
+          </div>
+        </div>
+      </figure>
+
+      <div class="pub-group">
+        <p class="pub-group-title">Journal article</p>
+        <ul class="pub-list">
+          <li class="pub">
+            <span class="pub-year mono">2026</span>
+            <div class="pub-body">
+              <p class="pub-title">"Contextual Optimizer through Neighborhood Estimation for Prescriptive Analytics."</p>
+              <p class="pub-meta">Jin, X., Shen, Y., &amp; Lee, L. H. · INFORMS Journal on Computing, 2026 (Articles in Advance)</p>
+              <a class="pub-doi" href="https://doi.org/10.1287/ijoc.2025.1134">DOI 10.1287/ijoc.2025.1134</a>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="pub-group">
+        <p class="pub-group-title">Under review</p>
+        <ul class="pub-list">
+          <li class="pub">
+            <span class="pub-year mono">OR</span>
+            <div class="pub-body">
+              <p class="pub-title">"Pricing Checked Baggage under Rational Inattention: Evidence, Estimation, and Field Deployment."</p>
+              <p class="pub-meta">Jin, X., Ren, J., Sun, H., Liu, C., &amp; Teo, C.-P. · Under review, Operations Research</p>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="pub-group">
+        <p class="pub-group-title">Working papers</p>
+        <ul class="pub-list">
+          <li class="pub">
+            <span class="pub-year mono">2026</span>
+            <div class="pub-body">
+              <p class="pub-title">"Large-Scale Optimization Model Auto-Formulation: Harnessing LLM Flexibility via Structured Workflow."</p>
+              <p class="pub-meta">Liang, K., Lu, Y., Mao, J., Sun, S., Yang, C., Zeng, C., Jin, X., Qin, H., Zhu, R., &amp; Teo, C.-P. · arXiv:2601.09635</p>
+              <a class="pub-doi" href="https://arxiv.org/abs/2601.09635">arXiv:2601.09635</a>
+            </div>
+          </li>
+          <li class="pub">
+            <span class="pub-year mono">2025</span>
+            <div class="pub-body">
+              <p class="pub-title">"Pricing Analytics for Ancillary Products: Learning from Conversion Data to Optimize Revenue."</p>
+              <p class="pub-meta">Liu, C., Sun, H., Teo, C.-P., &amp; Jin, X. · SSRN 5285522</p>
+              <a class="pub-doi" href="https://papers.ssrn.com/sol3/papers.cfm?abstract_id=5285522">SSRN 5285522</a>
+            </div>
+          </li>
+          <li class="pub">
+            <span class="pub-year mono">WP</span>
+            <div class="pub-body">
+              <p class="pub-title">"Staffing Ahead of Congestion: Certified Reliability for Queues That Do Not Reset."</p>
+              <p class="pub-meta">Jin, X., Shu, S., &amp; Teo, C.-P. · In preparation</p>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="pub-group">
+        <details class="pub-collapse">
+          <summary class="pub-group-title pub-summary">Conference proceedings<span class="pub-count">10</span></summary>
+        <ul class="pub-list">
+          <li class="pub">
+            <span class="pub-year mono">2017</span>
+            <div class="pub-body">
+              <p class="pub-title">"Optimal Computing Budget Allocation via Sampling-Based Unbiased Approximation."</p>
+              <p class="pub-meta">Jin, X., Li, H., Lee, L. H., &amp; Chew, E. P. · Winter Simulation Conference (WSC)</p>
+            </div>
+          </li>
+          <li class="pub">
+            <span class="pub-year mono">2018</span>
+            <div class="pub-body">
+              <p class="pub-title">"Budget Allocation Problem in Simulation Analytics."</p>
+              <p class="pub-meta">Jin, X. · Winter Simulation Conference (WSC)</p>
+            </div>
+          </li>
+          <li class="pub">
+            <span class="pub-year mono">2019</span>
+            <div class="pub-body">
+              <p class="pub-title">"Optimal Budget Allocation in Simulation Analytics."</p>
+              <p class="pub-meta">Jin, X., Li, H., &amp; Lee, L. H. · IEEE CASE</p>
+            </div>
+          </li>
+          <li class="pub">
+            <span class="pub-year mono">2020</span>
+            <div class="pub-body">
+              <p class="pub-title">"A Hybrid of Shrinking Ball Method and Optimal Large Deviation Rate Estimation in Continuous Contextual Simulation Optimization with Single Observation."</p>
+              <p class="pub-meta">Jin, X., Shen, Y., Lee, L. H., Chew, E. P., &amp; Shoemaker, C. A. · Winter Simulation Conference (WSC)</p>
+            </div>
+          </li>
+          <li class="pub">
+            <span class="pub-year mono">2020</span>
+            <div class="pub-body">
+              <p class="pub-title">"Combining Adaptive Budget Allocation with Surrogate Methodology in Solving Continuous Scenario-Based Simulation Optimization."</p>
+              <p class="pub-meta">Jin, X., Shen, Y., Li, H., Lee, L. H., Chew, E. P., &amp; Shoemaker, C. A. · IEEE CASE</p>
+            </div>
+          </li>
+          <li class="pub">
+            <span class="pub-year mono">2021</span>
+            <div class="pub-body">
+              <p class="pub-title">"Three Carriages Driving the Development of Intelligent Digital Twins — Simulation Plus Optimization and Learning."</p>
+              <p class="pub-meta">Li, H., Cao, X., Jin, X., Lee, L. H., &amp; Chew, E. P. · Winter Simulation Conference (WSC)</p>
+            </div>
+          </li>
+          <li class="pub">
+            <span class="pub-year mono">2021</span>
+            <div class="pub-body">
+              <p class="pub-title">"A Unified Offline-Online Learning Paradigm via Simulation for Scenario-Dependent Selection."</p>
+              <p class="pub-meta">Liu, H., Jin, X., Li, H., Lee, L. H., &amp; Chew, E. P. · Winter Simulation Conference (WSC)</p>
+            </div>
+          </li>
+          <li class="pub">
+            <span class="pub-year mono">2022</span>
+            <div class="pub-body">
+              <p class="pub-title">"An Efficient Bi-Fidelity Method for Continuous Simulation Optimization."</p>
+              <p class="pub-meta">Wang, G., Jin, X., &amp; Lee, L. H. · IEEE CASE</p>
+            </div>
+          </li>
+          <li class="pub">
+            <span class="pub-year mono">2022</span>
+            <div class="pub-body">
+              <p class="pub-title">"Optimal Computing Budget Allocation for Multi-Objective Ranking and Selection Under Bernoulli Distribution."</p>
+              <p class="pub-meta">Zhao, T., Jin, X., &amp; Lee, L. H. · Winter Simulation Conference (WSC)</p>
+            </div>
+          </li>
+          <li class="pub">
+            <span class="pub-year mono">2022</span>
+            <div class="pub-body">
+              <p class="pub-title">"Multi-Fidelity Discrete Optimization via Simulation."</p>
+              <p class="pub-meta">Li, D., Liu, H., Jin, X., Li, H., Chew, E. P., Tan, K. C., &amp; Lin, Y. H. · Winter Simulation Conference (WSC)</p>
+            </div>
+          </li>
+        </ul>
+        </details>
+      </div>
+    </section>
+
+    <!-- ===== 05 EXPERIENCE ===== -->
+    <section class="section" id="experience" aria-labelledby="exp-h">
+      <div class="section-head">
+        <span class="section-index mono">05</span>
+        <h2 class="section-title" id="exp-h">Experience</h2>
+        <span class="section-note">newest first</span>
+      </div>
+      <div class="rows">
+        <div class="row">
+          <span class="row-when mono">2024 — now</span>
+          <div>
+            <p class="row-role">Senior Research Fellow</p>
+            <p class="row-org">SIA-NUS Corporate Laboratory · National University of Singapore · Nov 2024 – present</p>
+            <p class="row-note">Research Fellow, same lab, Nov 2022 – Nov 2024.</p>
+          </div>
+        </div>
+        <div class="row">
+          <span class="row-when mono">2020 — 2022</span>
+          <div>
+            <p class="row-role">Research Fellow</p>
+            <p class="row-org">C4NGL / C4NGP · National University of Singapore · Oct 2020 – Nov 2022</p>
+          </div>
+        </div>
+        <div class="row">
+          <span class="row-when mono">2019 — 2020</span>
+          <div>
+            <p class="row-role">Research Engineer</p>
+            <p class="row-org">C4NGP · National University of Singapore · Aug 2019 – Oct 2020</p>
+          </div>
+        </div>
+        <div class="row">
+          <span class="row-when mono">Earlier</span>
+          <div>
+            <p class="row-role">Internships</p>
+            <p class="row-org">Intern, DB Schenker Asia Pacific Regional Office (2017) · Intern, Nanjing Zhong Chu Intelligent Logistics (2014)</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 06 EDUCATION ===== -->
+    <section class="section" id="education" aria-labelledby="edu-h">
+      <div class="section-head">
+        <span class="section-index mono">06</span>
+        <h2 class="section-title" id="edu-h">Education</h2>
+      </div>
+      <div class="rows">
+        <div class="row">
+          <span class="row-when mono">2015 — 2020</span>
+          <div>
+            <p class="row-role">Ph.D., Industrial Systems Engineering &amp; Management</p>
+            <p class="row-org">National University of Singapore · Advisor: Prof. Loo Hay Lee</p>
+            <p class="row-note">Dissertation: <i>On Solving the Real-Time Decision Problem by Simulation Analytics and Parallelization Acceleration</i>.</p>
+            <p class="row-gpa mono">GPA 4.21 / 5.00</p>
+          </div>
+        </div>
+        <div class="row">
+          <span class="row-when mono">2011 — 2015</span>
+          <div>
+            <p class="row-role">B.A., School of Management and Engineering</p>
+            <p class="row-org">Nanjing University</p>
+            <p class="row-gpa mono">GPA 85 / 100</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 07 TECHNICAL SKILLS ===== -->
+    <section class="section" id="skills" aria-labelledby="skills-h">
+      <div class="section-head">
+        <span class="section-index mono">07</span>
+        <h2 class="section-title" id="skills-h">Technical Skills</h2>
+      </div>
+      <div class="skills">
+        <div class="skill-row">
+          <span class="skill-cat">Programming</span>
+          <div class="skill-items">
+            <span>Python (primary)</span><span>C</span><span>C#</span><span>MATLAB</span><span>LaTeX</span>
+          </div>
+        </div>
+        <div class="skill-row">
+          <span class="skill-cat">Machine learning</span>
+          <div class="skill-items">
+            <span>PyTorch</span><span>Deep learning &amp; Transformers</span><span>Deep choice modelling</span><span>Multi-agent LLM systems</span><span>Randomized experiments &amp; causal analysis</span><span>scikit-learn</span><span>XGBoost</span><span>pandas</span><span>NumPy</span>
+          </div>
+        </div>
+        <div class="skill-row">
+          <span class="skill-cat">Optimization</span>
+          <div class="skill-items">
+            <span>Gurobi</span><span>CPLEX</span><span>Simulation-based optimization</span><span>Ranking &amp; selection</span>
+          </div>
+        </div>
+        <div class="skill-row">
+          <span class="skill-cat">Simulation</span>
+          <div class="skill-items">
+            <span>Discrete-event simulation (custom C# / C++ engines)</span><span>SimPy</span>
+          </div>
+        </div>
+        <div class="skill-row">
+          <span class="skill-cat">AI-assisted dev</span>
+          <div class="skill-items">
+            <span>Claude Code (agentic AI coding)</span>
+          </div>
+        </div>
+        <div class="skill-row">
+          <span class="skill-cat">Data &amp; infrastructure</span>
+          <div class="skill-items">
+            <span>SQL</span><span>Git</span><span>AWS / GCP</span><span>Docker</span><span>Django</span><span>React</span><span>MongoDB</span><span>Celery</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 08 SPEAKING & SERVICE ===== -->
+    <section class="section" id="service" aria-labelledby="service-h">
+      <div class="section-head">
+        <span class="section-index mono">08</span>
+        <h2 class="section-title" id="service-h">Speaking &amp; Service</h2>
+      </div>
+      <ul class="service-list">
+        <li class="service-item">
+          <span class="service-tag">Presenter</span>
+          <span class="service-text">INFORMS Annual Meeting 2025</span>
+        </li>
+        <li class="service-item">
+          <span class="service-tag">Invited speaker</span>
+          <span class="service-text">Sabre, 2025 — <span class="sub">a simulation technique for revenue-management practitioners</span></span>
+        </li>
+        <li class="service-item">
+          <span class="service-tag">Presenter</span>
+          <span class="service-text">IORA Industrial Day, 2025</span>
+        </li>
+        <li class="service-item">
+          <span class="service-tag">Peer reviewer</span>
+          <span class="service-text">Applied Operations and Analytics <span class="sub">(Taylor &amp; Francis)</span></span>
+        </li>
+        <li class="service-item">
+          <span class="service-tag">Named researcher</span>
+          <span class="service-text">SIA–NUS Digital Aviation Corporate Laboratory <span class="sub">— supported by the National Research Foundation, Singapore</span></span>
+        </li>
+      </ul>
+    </section>
+
+  </div>
+</main>
+
+<!-- ===== FOOTER (contentinfo landmark — outside <main>) ===== -->
+<footer class="site-footer" role="contentinfo" aria-label="Contact and site footer">
+  <div class="footer-inner">
+    <div class="footer-id">
+      <p class="f-name">Xiao Jin</p>
+      <p class="f-role mono">Senior Research Fellow · SIA-NUS Corporate Lab, NUS · Singapore</p>
+    </div>
+    <nav class="footer-links" aria-label="Contact links">
+      <a href="mailto:xiao.j@nus.edu.sg">xiao.j@nus.edu.sg</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://scholar.google.com/citations?user=NffLyjoAAAAJ" rel="me noopener" target="_blank">Google Scholar</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://www.linkedin.com/in/%E6%9E%AD-%E9%87%91-b54684246/" rel="me noopener" target="_blank">LinkedIn</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="cv-academic.pdf" download>Academic CV</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="cv-industry.pdf" download>Industry CV</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle colour theme">Theme</button>
+    </nav>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var root = document.documentElement;
+
+  /* ---------- Theme toggle (initial theme applied pre-paint in <head>) ---------- */
+  function currentTheme(){
+    var t = root.getAttribute('data-theme');
+    if(t) return t;
+    return (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+  }
+  var btn = document.getElementById('themeToggle');
+  function label(){ if(btn){ btn.textContent = currentTheme() === 'dark' ? 'Light mode' : 'Dark mode'; } }
+  label();
+  if(btn){
+    btn.addEventListener('click', function(){
+      var next = currentTheme() === 'dark' ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      try{ localStorage.setItem('theme', next); }catch(e){}
+      label();
+    });
+  }
+
+  /* ---------- Inert placeholder links (until real profile URLs are pasted) ---------- */
+  document.addEventListener('click', function(e){
+    var el = e.target;
+    var a = el && el.closest ? el.closest('a[href="#"]') : null;
+    if(a){ e.preventDefault(); }
+  });
+
+  /* ---------- Scroll-spy (progressive enhancement) ---------- */
+  var ticks = Array.prototype.slice.call(document.querySelectorAll('.tick'));
+  var map = {};
+  var sections = [];
+  ticks.forEach(function(t){
+    var id = (t.getAttribute('href') || '').slice(1);
+    var el = document.getElementById(id);
+    if(el){ map[id] = t; sections.push(el); }
+  });
+
+  function setActive(id){
+    ticks.forEach(function(t){ t.classList.remove('is-active'); t.removeAttribute('aria-current'); });
+    if(map[id]){ map[id].classList.add('is-active'); map[id].setAttribute('aria-current','location'); }
+  }
+
+  if('IntersectionObserver' in window && sections.length){
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ setActive(en.target.id); }
+      });
+    }, { rootMargin: '-45% 0px -50% 0px', threshold: 0 });
+    sections.forEach(function(s){ io.observe(s); });
+  }
+
+  /* ---------- Progress line (resilient scroll read across engines) ---------- */
+  var ticking = false;
+  function updateProgress(){
+    var y = window.scrollY || root.scrollTop || document.body.scrollTop || 0;
+    var max = (root.scrollHeight || document.body.scrollHeight) - window.innerHeight;
+    var p = max > 0 ? y / max : 0;
+    if(p < 0) p = 0; if(p > 1) p = 1;
+    root.style.setProperty('--progress', p.toFixed(4));
+    ticking = false;
+  }
+  function onScroll(){
+    if(ticking) return;
+    ticking = true;
+    window.requestAnimationFrame(updateProgress);
+  }
+  window.addEventListener('scroll', onScroll, { passive:true });
+  window.addEventListener('resize', onScroll);
+  updateProgress();
+})();
+
+  /* CONE stills are 66-72 KB; the animations are ~1.5 MB each and load on demand. */
+  document.querySelectorAll('.cone-play').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      if (btn.dataset.playing) return;
+      btn.dataset.playing = '1';
+      btn.classList.add('is-playing');
+      btn.querySelector('img').src = btn.dataset.anim;
+    });
+  });
+</script>
+</body>
+</html>
