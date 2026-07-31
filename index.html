@@ -7,7 +7,7 @@
 <meta name="description" content="Xiao Jin — Senior Research Fellow, SIA-NUS Corporate Laboratory (NUS). Revenue-management and simulation-optimization research shipped as production systems.">
 <meta name="color-scheme" content="light dark">
 
-<!-- Favicon: teal tile with a rising yield curve, echoing the hero figure -->
+<!-- Favicon: teal tile with a rising curve -->
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%230E6E78'/><path d='M5.5 24.5C11 24.5 12.5 7.5 26.5 7.5' stroke='%23fff' stroke-width='3.2' fill='none' stroke-linecap='round'/></svg>">
 
 <!-- Link preview -->
@@ -221,8 +221,9 @@
      ============================================================ */
   .hero{ padding:56px 0 44px; border-bottom:1px solid var(--hairline); }
   .hero-grid{ display:grid; grid-template-columns:1fr; gap:34px; }
+  .hero-head{ max-width:66ch; }   /* no side figure: cap the measure */
   @media (min-width:820px){
-    .hero-grid{ grid-template-columns:1.3fr 0.9fr; align-items:start; gap:44px; }
+    .hero-grid{ grid-template-columns:minmax(0,1fr); align-items:start; gap:44px; }
   }
   .eyebrow{ font-size:var(--fs-2); color:var(--muted); letter-spacing:.03em; }
   .hero-name{ color:var(--ink); font-weight:600; }
@@ -268,33 +269,6 @@
   .link-inline[aria-disabled="true"]{ color:var(--muted); cursor:default; }
   .link-inline[aria-disabled="true"]:hover{ border-bottom-color:transparent; }
 
-  /* Hero figure — signature yield/convergence curve */
-  .hero-figure{ margin:0; display:flex; flex-direction:column; gap:10px; }
-  .figure-frame{
-    background:var(--panel); border:1px solid var(--hairline);
-    border-radius:var(--radius); padding:16px 18px 8px;
-  }
-  .yield-chart{ width:100%; height:auto; display:block; }
-  .grid line{ stroke:var(--hairline); stroke-width:1; }
-  .axis{ stroke:var(--hairline); stroke-width:1.25; }
-  .target{ stroke:var(--signal); stroke-width:1; stroke-dasharray:3 4; opacity:.4; }
-  #yieldGrad stop{ stop-color:var(--signal); }
-  .curve-area{ fill:url(#yieldGrad); opacity:0; animation:fadeIn .8s ease-out .55s forwards; }
-  .curve-line{
-    fill:none; stroke:var(--signal); stroke-width:2.5;
-    stroke-linecap:round; stroke-linejoin:round;
-    stroke-dasharray:1; stroke-dashoffset:1;
-    animation:draw 1.15s cubic-bezier(.22,.61,.36,1) .15s forwards;
-  }
-  .curve-halo{ fill:var(--signal); opacity:0; animation:haloIn .6s ease-out 1.18s forwards; }
-  .curve-dot{ fill:var(--signal); stroke:var(--panel); stroke-width:1.5; opacity:0; animation:fadeIn .45s ease-out 1.2s forwards; }
-  .chart-label{ fill:var(--muted); font-family:var(--mono); font-size:10px; letter-spacing:.02em; }
-  .chart-axis-title{ fill:var(--muted); font-family:var(--mono); font-size:9px; letter-spacing:.08em; }
-  .chart-opt{ fill:var(--signal); font-family:var(--mono); font-size:10px; font-weight:600; }
-  .figure-cap{ font-size:var(--fs-1); color:var(--muted); line-height:1.5; padding:0 2px; }
-  @keyframes draw{ to{ stroke-dashoffset:0; } }
-  @keyframes fadeIn{ to{ opacity:1; } }
-  @keyframes haloIn{ to{ opacity:.15; } }
 
   /* ============================================================
      01 CAPABILITIES
@@ -584,10 +558,6 @@
       animation-iteration-count:1 !important;
       transition-duration:.001ms !important;
     }
-    .curve-line{ stroke-dashoffset:0 !important; }
-    .curve-area{ opacity:1 !important; }
-    .curve-dot{ opacity:1 !important; }
-    .curve-halo{ opacity:.15 !important; }
   }
 </style>
 </head>
@@ -648,54 +618,6 @@
           </div>
         </div>
 
-        <!-- SIGNATURE: airline selling-horizon yield / convergence curve (illustrative) -->
-        <figure class="hero-figure">
-          <div class="figure-frame">
-            <svg class="yield-chart" viewBox="0 0 520 340" role="img" aria-labelledby="figTitle figDesc" preserveAspectRatio="xMidYMid meet">
-              <title id="figTitle">Illustrative cumulative yield across the airline selling horizon</title>
-              <desc id="figDesc">An illustrative booking curve that enters low at T minus 365 days from departure, rises convexly through the selling horizon, and settles onto its optimum near departure, marked with a single point. Not measured data.</desc>
-              <defs>
-                <linearGradient id="yieldGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0" stop-opacity="0.16"></stop>
-                  <stop offset="1" stop-opacity="0"></stop>
-                </linearGradient>
-              </defs>
-              <!-- faint measurement grid -->
-              <g class="grid" aria-hidden="true">
-                <line x1="70" y1="60"  x2="486" y2="60"></line>
-                <line x1="70" y1="113" x2="486" y2="113"></line>
-                <line x1="70" y1="166" x2="486" y2="166"></line>
-                <line x1="70" y1="219" x2="486" y2="219"></line>
-                <line x1="174" y1="60" x2="174" y2="272"></line>
-                <line x1="278" y1="60" x2="278" y2="272"></line>
-                <line x1="382" y1="60" x2="382" y2="272"></line>
-                <line x1="486" y1="60" x2="486" y2="272"></line>
-              </g>
-              <!-- axes -->
-              <line class="axis" x1="70" y1="272" x2="486" y2="272"></line>
-              <line class="axis" x1="70" y1="60"  x2="70"  y2="272"></line>
-              <!-- target optimum line -->
-              <line class="target" x1="70" y1="78" x2="486" y2="78"></line>
-              <!-- area under trace -->
-              <path class="curve-area" d="M70 250 C130 246 168 240 214 220 C262 199 296 158 336 122 C380 84 436 80 486 78 L486 272 L70 272 Z"></path>
-              <!-- the data trace -->
-              <path class="curve-line" pathLength="1" d="M70 250 C130 246 168 240 214 220 C262 199 296 158 336 122 C380 84 436 80 486 78"></path>
-              <!-- settled optimum -->
-              <circle class="curve-halo" cx="486" cy="78" r="9"></circle>
-              <circle class="curve-dot"  cx="486" cy="78" r="4.5"></circle>
-              <text class="chart-opt" x="478" y="66" text-anchor="end">optimum</text>
-              <!-- axis labels -->
-              <text class="chart-label" x="70"  y="288" text-anchor="middle">T-365</text>
-              <text class="chart-label" x="174" y="288" text-anchor="middle">T-180</text>
-              <text class="chart-label" x="278" y="288" text-anchor="middle">T-90</text>
-              <text class="chart-label" x="382" y="288" text-anchor="middle">T-30</text>
-              <text class="chart-label" x="486" y="288" text-anchor="middle">T-0</text>
-              <text class="chart-axis-title" x="278" y="312" text-anchor="middle">SELLING HORIZON · DAYS TO DEPARTURE</text>
-              <text class="chart-axis-title" x="20" y="166" text-anchor="middle" transform="rotate(-90 20 166)">CUMULATIVE YIELD</text>
-            </svg>
-          </div>
-          <figcaption class="figure-cap mono">Illustrative — cumulative yield across the selling horizon, converging toward optimum near departure.</figcaption>
-        </figure>
       </div>
     </header>
 
