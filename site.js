@@ -32,14 +32,33 @@
     }
   }
 
-  /* CONE: the poster is the converged frame (23 KB); the 0.65 MB animation loads on click. */
+  /* CONE: the poster is the converged frame (25 KB); the 0.56 MB animation loads on click.
+     It is fetched and decoded off-screen first, so the poster stays up until the first
+     frame is ready -- swapping src straight away left a blank box while it downloaded. */
   document.querySelectorAll('.cone-play').forEach(function(b){
     var img = b.querySelector('img'), badge = b.querySelector('.cone-badge');
+    var PLAY = '▶ Play the 700 runs', STOP = '■ Stop';
+    var loading = false;
     b.addEventListener('click', function(){
-      var on = b.getAttribute('aria-pressed') === 'true';
-      img.src = on ? b.dataset.poster : b.dataset.anim;
-      b.setAttribute('aria-pressed', on ? 'false' : 'true');
-      badge.textContent = on ? '▶ Play the 700 runs' : '■ Stop';
+      if (loading) return;
+      if (b.getAttribute('aria-pressed') === 'true') {
+        img.src = b.dataset.poster;
+        b.setAttribute('aria-pressed', 'false');
+        badge.textContent = PLAY;
+        return;
+      }
+      loading = true;
+      badge.textContent = 'Loading…';
+      var pre = new Image();
+      function show(){
+        loading = false;
+        img.src = b.dataset.anim;
+        b.setAttribute('aria-pressed', 'true');
+        badge.textContent = STOP;
+      }
+      pre.onload = function(){ pre.decode ? pre.decode().then(show, show) : show(); };
+      pre.onerror = function(){ loading = false; badge.textContent = PLAY; };
+      pre.src = b.dataset.anim;
     });
   });
 })();
