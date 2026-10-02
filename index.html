@@ -31,7 +31,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="site.css?v=2">
+<link rel="stylesheet" href="site.css?v=6">
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -71,8 +71,8 @@
       <h2 id="research-h">Research</h2>
 
       <article id="attention">
-        <h3>Pricing when shoppers ration their attention</h3>
-        <p>Shoppers compare prices only where comparing pays. My model prices a whole menu by that attention, with one formula.</p>
+        <h3>Pricing a menu when shoppers ration attention</h3>
+        <p>One price moves shoppers across a whole menu. My model sets every price by how closely shoppers watch it.</p>
         <figure class="anim" data-anim="ri">
           <div class="anim-top">
             <ol class="acts" aria-label="Steps of the animation">
@@ -84,17 +84,17 @@
           </div>
           <p class="anim-cap" aria-live="polite"></p>
           <div class="anim-body">
-            <svg class="anim-main" viewBox="0 0 420 236" role="img" aria-label="A menu of five checked-baggage tiers from 20 to 40 kilograms. Shoppers watch the 20 kilogram price closely and barely look at the others: they react to it about 80 times more strongly than to 40 kilograms. A rule table keeps equal price gaps. Our model adds an attention markup that is small for the watched tier and large for the others, so the 20 kilogram price falls and the heaviest tier rises. In a randomized field test this raised baggage revenue 7.8 percent while the average price fell."></svg>
+            <svg class="anim-main" viewBox="0 0 420 236" role="img" aria-label="Problem: checked bags are sold as a menu of five weight tiers, 20 to 40 kilograms, plus no bag. When the 20 kilogram price rises, some shoppers switch to another tier and more skip the bag, so all five prices must be set together. Method: shoppers watch the 20 kilogram price closely and barely look at the others, reacting to it about 80 times more strongly than to 40 kilograms. A rule table keeps equal price gaps; our model adds an attention markup that is small for the watched tier and large for the others, so the 20 kilogram price falls and the heaviest tier rises. Result: in a randomized field test baggage revenue rose 7.8 percent while the average price fell."></svg>
             <div class="anim-result"></div>
           </div>
-          <figcaption>Eyes: own-price reaction from 1.41 million randomized booking sessions, 20 kg = 100. Prices illustrative. Result: field test.</figcaption>
+          <figcaption>Menu, prices and shoppers illustrative. Eyes: own-price reaction from 1.41 million randomized sessions, 20 kg = 100. Result: field test.</figcaption>
         </figure>
         <p class="cite">First-author paper under review at <i>Operations Research</i>; a related paper on learning from conversion data is at minor revision.</p>
       </article>
 
       <article id="cone">
-        <h3>Spending simulation budget where the decision changes</h3>
-        <p>When the best decision depends on context, most contexts are easy. CONE spends simulation runs where the decision is close.</p>
+        <h3>Learning the best decision for every context</h3>
+        <p>Operations need a rule: the best option for each context. CONE learns it by simulation, spending runs on close calls.</p>
         <figure class="anim" data-anim="cone">
           <div class="anim-top">
             <ol class="acts" aria-label="Steps of the animation">
@@ -106,17 +106,17 @@
           </div>
           <p class="anim-cap" aria-live="polite"></p>
           <div class="anim-body">
-            <svg class="anim-main" viewBox="0 0 420 244" role="img" aria-label="Two squares show the same two-dimensional context space with a shaded band where the two best decisions are nearly tied. Uniform sampling puts 22 percent of its 700 runs in that band; CONE puts 35 percent there. Averaged over 20 runs, CONE reaches 90 percent correct decisions after about 150 runs, against about 240 for uniform sampling."></svg>
+            <svg class="anim-main" viewBox="0 0 420 244" role="img" aria-label="Problem: three options whose cost changes with the context, drawn as curves along one slice of contexts. The lowest curve gives the rule, the cheapest option at each context: A, then C, then B. Costs are seen only through noisy simulation runs, and near the crossings the best option is a close call. With two context features the rule is a map, and close calls line its borders. Method: uniform sampling and CONE each spend 700 runs; uniform puts 22 percent of them on close calls, CONE 35 percent. Result: averaged over 20 runs, CONE reaches 90 percent correct decisions after about 150 runs, against about 240 for uniform sampling."></svg>
             <div class="anim-result"></div>
           </div>
-          <figcaption>Shaded band: the 20% of contexts where the two best options are nearest. Accuracy averages 20 independent runs.</figcaption>
+          <figcaption>Test case: 3 options, 2-D context; curves: one slice. Shaded: 20% of contexts with closest top two. Accuracy: 20-run mean.</figcaption>
         </figure>
         <p class="cite"><i>INFORMS Journal on Computing</i>, 2026, with Y. Shen and L. H. Lee · <a href="https://doi.org/10.1287/ijoc.2025.1134">doi:10.1287/ijoc.2025.1134</a></p>
       </article>
 
       <article id="staffing">
         <h3>Staffing queues that do not reset</h3>
-        <p>Waiting callers carry a surge into the next half hour. Relocate–Certify–Repair staffs for that, with a certified reliability guarantee.</p>
+        <p>Rostering half-hour slots while calls and patience shift and callers carry over. Certified service, with staff placed ahead of congestion.</p>
         <figure class="anim" data-anim="staff">
           <div class="anim-top">
             <ol class="acts" aria-label="Steps of the animation">
@@ -128,10 +128,10 @@
           </div>
           <p class="anim-cap" aria-live="polite"></p>
           <div class="anim-body">
-            <svg class="anim-main" viewBox="0 0 420 236" role="img" aria-label="A morning in a call centre, 8:00 to 12:00. After a morning surge, waiting callers spill into the next half hour, and a roster sized half hour by half hour loses 11 percent of calls in the half hour after the surge. The certified plan adds five agents to that half hour only and meets the 5 percent cap. In a simulation calibrated to a hospital contact centre, the certified plan meets the cap in 186 of 190 weekday slots, against 41 for the textbook formula."></svg>
+            <svg class="anim-main" viewBox="0 0 420 236" role="img" aria-label="Problem: a call-centre morning, 8:00 to 12:00, split into eight half-hour slots, each needing a staffing level. Calls surge at 9:00 while patience drops, callers still waiting at the end of a slot carry into the next, and every slot must keep hang-ups under 5 percent. Method, in three steps, with staff drawn as bars against incoming calls and the waiting line below. First, a textbook plan that sizes each slot as if it starts empty puts 26 staff at 9:00, below the surge; a backlog builds and carries over, and hang-ups on a bad day reach 54 percent at 9:30. Second, certificates test the slots in order with the callers each inherits and add staff until each passes: 9:30 inherits 49 waiting callers and needs 49 staff, 111 staff-slots in all. Third, staffing ahead puts 13 more at 9:00 so staff keep pace with the surge, no backlog forms, and 9:30 needs 36 fewer: every slot still certified, with 21 percent fewer staff-slots. Result: at a calibrated hospital contact centre, certified plans keep 186 of 190 weekday slots within the cap, against 41 for the textbook formula."></svg>
             <div class="anim-result"></div>
           </div>
-          <figcaption>Morning: illustrative queue model, not centre data. Result: formula is SIPP with Erlang-A; ours uses 8% more agent-slots.</figcaption>
+          <figcaption>Toy morning, long patience: illustrative. Bars: calls staff can answer. Result: calibrated simulation vs SIPP; ours uses 8% more agent-slots.</figcaption>
         </figure>
         <p class="cite">Working paper with S. Shu and C.-P. Teo.</p>
       </article>
@@ -224,7 +224,7 @@
 </div>
 
 <script src="site.js?v=4"></script>
-<script src="anim-data.js?v=2"></script>
-<script src="anim.js?v=3"></script>
+<script src="anim-data.js?v=6"></script>
+<script src="anim.js?v=7"></script>
 </body>
 </html>
