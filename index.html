@@ -4,14 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Xiao Jin · Pricing and Simulation Optimization</title>
-<meta name="description" content="Xiao Jin, Senior Research Fellow at the National University of Singapore. I design pricing and simulation-optimization methods, and test them on real systems.">
+<meta name="description" content="Xiao Jin, Senior Research Fellow at the National University of Singapore. Decisions under uncertainty — pricing, simulation, staffing — in aviation, healthcare, maritime and logistics.">
 <meta name="color-scheme" content="light dark">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%230E6E78'/><path d='M5.5 24.5C11 24.5 12.5 7.5 26.5 7.5' stroke='%23fff' stroke-width='3.2' fill='none' stroke-linecap='round'/></svg>">
 
 <meta property="og:type" content="profile">
 <meta property="og:site_name" content="Xiao Jin">
 <meta property="og:title" content="Xiao Jin · Pricing and Simulation Optimization">
-<meta property="og:description" content="I design pricing and simulation-optimization methods, and test them on real systems.">
+<meta property="og:description" content="Decisions under uncertainty — pricing, simulation, staffing — in aviation, healthcare, maritime and logistics.">
 <meta property="og:url" content="https://farkasle.github.io/">
 <meta property="og:image" content="https://farkasle.github.io/og-image.png">
 <meta property="og:image:width" content="1200">
@@ -31,7 +31,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="site.css?v=2">
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -50,7 +50,7 @@
     <div class="hero">
       <h1>Xiao Jin</h1>
       <p class="role">Senior Research Fellow · National University of Singapore</p>
-      <p class="lede">I design pricing and simulation&#8209;optimization methods, and test them on real systems.</p>
+      <p class="lede">Decisions under uncertainty interest me: pricing, simulation, staffing. I build methods that hold up in aviation, healthcare, maritime and logistics.</p>
 
       <ul class="proof">
         <li><a href="#airline"><b>+7–8%</b><span>baggage revenue in a randomized airline field test</span></a></li>
@@ -72,28 +72,67 @@
 
       <article id="attention">
         <h3>Pricing when shoppers ration their attention</h3>
-        <p>Shoppers compare prices hardest where comparing pays. I model this as rational inattention: each product’s optimal price splits into cost, a product-specific attention markup and one shared demand term. A single formula then prices a whole menu, and calibration reduces to a linear program.</p>
+        <p>Shoppers compare prices only where comparing pays. My model prices a whole menu by that attention, with one formula.</p>
+        <figure class="anim" data-anim="ri">
+          <div class="anim-top">
+            <ol class="acts" aria-label="Steps of the animation">
+              <li><button type="button" aria-pressed="false">Problem</button></li>
+              <li><button type="button" aria-pressed="false">Method</button></li>
+              <li><button type="button" aria-pressed="false">Result</button></li>
+            </ol>
+            <button class="anim-replay" type="button">Replay</button>
+          </div>
+          <p class="anim-cap" aria-live="polite"></p>
+          <div class="anim-body">
+            <svg class="anim-main" viewBox="0 0 420 236" role="img" aria-label="A menu of five checked-baggage tiers from 20 to 40 kilograms. Shoppers watch the 20 kilogram price closely and barely look at the others: they react to it about 80 times more strongly than to 40 kilograms. A rule table keeps equal price gaps. Our model adds an attention markup that is small for the watched tier and large for the others, so the 20 kilogram price falls and the heaviest tier rises. In a randomized field test this raised baggage revenue 7.8 percent while the average price fell."></svg>
+            <div class="anim-result"></div>
+          </div>
+          <figcaption>Eyes: own-price reaction from 1.41 million randomized booking sessions, 20 kg = 100. Prices illustrative. Result: field test.</figcaption>
+        </figure>
         <p class="cite">First-author paper under review at <i>Operations Research</i>; a related paper on learning from conversion data is at minor revision.</p>
       </article>
 
       <article id="cone">
         <h3>Spending simulation budget where the decision changes</h3>
-        <p>When the best decision depends on context, most contexts are easy: one option clearly wins. CONE locates the boundaries between decisions and spends its simulation runs there, instead of spreading them evenly.</p>
-        <figure class="cone">
-          <div class="cone-labels" aria-hidden="true"><span>CONE</span><span>Uniform sampling</span></div>
-          <button class="cone-play" type="button" aria-pressed="false" data-anim="cone-budget.webp?v=2" data-poster="cone-budget-poster.webp?v=2" aria-label="Play or stop the animation of how each method spends 700 simulation runs">
-            <img src="cone-budget-poster.webp?v=2" width="1352" height="516" decoding="async"
-                 alt="Two heatmaps of simulation runs per cell over a two-dimensional context space. On the left, CONE's runs concentrate along the white boundary lines between optimal decisions. On the right, uniform sampling spreads runs evenly with no relation to the boundaries.">
-            <span class="cone-badge">▶&#8194;Play the 700 runs</span>
-          </button>
-          <figcaption>Simulation runs per cell after the same 700-run budget; brighter means more runs. White lines are the true boundaries between optimal decisions.</figcaption>
+        <p>When the best decision depends on context, most contexts are easy. CONE spends simulation runs where the decision is close.</p>
+        <figure class="anim" data-anim="cone">
+          <div class="anim-top">
+            <ol class="acts" aria-label="Steps of the animation">
+              <li><button type="button" aria-pressed="false">Problem</button></li>
+              <li><button type="button" aria-pressed="false">Method</button></li>
+              <li><button type="button" aria-pressed="false">Result</button></li>
+            </ol>
+            <button class="anim-replay" type="button">Replay</button>
+          </div>
+          <p class="anim-cap" aria-live="polite"></p>
+          <div class="anim-body">
+            <svg class="anim-main" viewBox="0 0 420 244" role="img" aria-label="Two squares show the same two-dimensional context space with a shaded band where the two best decisions are nearly tied. Uniform sampling puts 22 percent of its 700 runs in that band; CONE puts 35 percent there. Averaged over 20 runs, CONE reaches 90 percent correct decisions after about 150 runs, against about 240 for uniform sampling."></svg>
+            <div class="anim-result"></div>
+          </div>
+          <figcaption>Shaded band: the 20% of contexts where the two best options are nearest. Accuracy averages 20 independent runs.</figcaption>
         </figure>
         <p class="cite"><i>INFORMS Journal on Computing</i>, 2026, with Y. Shen and L. H. Lee · <a href="https://doi.org/10.1287/ijoc.2025.1134">doi:10.1287/ijoc.2025.1134</a></p>
       </article>
 
       <article id="staffing">
         <h3>Staffing queues that do not reset</h3>
-        <p>Call-centre congestion carries over from one period to the next, so period-by-period staffing misses its targets. Relocate–Certify–Repair staffs ahead of the congestion and certifies the plan with an exact finite-sample reliability bound. On fresh replications it met the abandonment target in 565 of 570 weekday periods.</p>
+        <p>Waiting callers carry a surge into the next half hour. Relocate–Certify–Repair staffs for that, with a certified reliability guarantee.</p>
+        <figure class="anim" data-anim="staff">
+          <div class="anim-top">
+            <ol class="acts" aria-label="Steps of the animation">
+              <li><button type="button" aria-pressed="false">Problem</button></li>
+              <li><button type="button" aria-pressed="false">Method</button></li>
+              <li><button type="button" aria-pressed="false">Result</button></li>
+            </ol>
+            <button class="anim-replay" type="button">Replay</button>
+          </div>
+          <p class="anim-cap" aria-live="polite"></p>
+          <div class="anim-body">
+            <svg class="anim-main" viewBox="0 0 420 236" role="img" aria-label="A morning in a call centre, 8:00 to 12:00. After a morning surge, waiting callers spill into the next half hour, and a roster sized half hour by half hour loses 11 percent of calls in the half hour after the surge. The certified plan adds five agents to that half hour only and meets the 5 percent cap. In a simulation calibrated to a hospital contact centre, the certified plan meets the cap in 186 of 190 weekday slots, against 41 for the textbook formula."></svg>
+            <div class="anim-result"></div>
+          </div>
+          <figcaption>Morning: illustrative queue model, not centre data. Result: formula is SIPP with Erlang-A; ours uses 8% more agent-slots.</figcaption>
+        </figure>
         <p class="cite">Working paper with S. Shu and C.-P. Teo.</p>
       </article>
 
@@ -124,10 +163,10 @@
             <span class="track"><i class="bar" style="--v:7.9"></i></span>
             <span class="lift-val"><b>+7.8–7.9%</b><small>prices lower</small></span>
           </div>
-          <figcaption>Change in baggage revenue per booking session against the uniform-price control, regression-adjusted. Randomized by session across 48 origin–destination pairs and about 59,000 sessions. p &lt; 0.01 for both of our variants; p &lt; 0.05 for the benchmark. Our models were calibrated on earlier data and not retuned during the test.</figcaption>
+          <figcaption>Revenue per session vs uniform control, regression-adjusted; 48 origin–destination pairs, ~59,000 sessions; p &lt; 0.01 ours, p &lt; 0.05 benchmark.</figcaption>
         </figure>
 
-        <p>Why it works: the 20&nbsp;kg tier is about 80× more price-sensitive than the 40&nbsp;kg tier. The model cuts prices where shoppers compare and raises them where they buy on need. It now runs in production.</p>
+        <p>The pricing model now runs in production at the airline.</p>
       </article>
 
       <article id="callcentre">
@@ -138,9 +177,9 @@
       <details class="more-projects">
         <summary>Three more field projects</summary>
         <dl class="rows">
-          <div><dt>Aviation</dt><dd><p>A revenue-prediction platform for a partner airline: a transformer choice model inside a booking simulator, forecasting one week to one year ahead. Analysts use it to test pricing decisions before launch.</p></dd></div>
+          <div><dt>Aviation</dt><dd><p>Revenue-prediction platform for a partner airline: a transformer choice model in a booking simulator, used to test pricing before launch.</p></dd></div>
           <div><dt>Healthcare</dt><dd><p>Appointment scheduling for the National Heart Centre Singapore that keeps the lead-time promise to patients under uncertain demand.</p></dd></div>
-          <div><dt>Logistics</dt><dd><p>Annual-throughput simulation of candidate layouts for Tuas Port; SKU repositioning across warehouses for Kuehne+Nagel, with 18–21% projected cost savings in simulation.</p></dd></div>
+          <div><dt>Maritime &amp; logistics</dt><dd><p>Throughput simulation of Tuas Port layouts; SKU repositioning for Kuehne+Nagel, with 18–21% projected savings in simulation.</p></dd></div>
         </dl>
       </details>
     </section>
@@ -152,7 +191,7 @@
         <div>
           <dt>Bio</dt>
           <dd>
-            <p>I am a Senior Research Fellow at the SIA–NUS Digital Aviation Corporate Laboratory, National University of Singapore, where I lead pricing and simulation projects with industry partners. I received my PhD in Industrial Systems Engineering and Management from NUS in 2020, advised by Loo Hay Lee.</p>
+            <p>Senior Research Fellow at the SIA–NUS Digital Aviation Corporate Lab, leading pricing and simulation projects with industry partners.</p>
             <p class="cite">Talks in 2025: INFORMS Annual Meeting, Sabre, IORA Industrial Day. Reviewer for <i>Applied Operations and Analytics</i>.</p>
           </dd>
         </div>
@@ -162,7 +201,7 @@
             <ul class="path">
               <li><span class="yr">2022–now</span><span>Research Fellow, then Senior Research Fellow (2024), SIA–NUS Corporate Lab</span></li>
               <li><span class="yr">2019–2022</span><span>Research Engineer, then Research Fellow (2020), C4NGP / C4NGL, NUS</span></li>
-              <li><span class="yr">2011–2020</span><span>BA, Nanjing University (2015); PhD, National University of Singapore (2020)</span></li>
+              <li><span class="yr">2011–2020</span><span>BA, Nanjing University (2015); PhD, NUS (2020), advised by Loo Hay Lee</span></li>
             </ul>
           </dd>
         </div>
@@ -184,6 +223,8 @@
   </footer>
 </div>
 
-<script src="site.js?v=3"></script>
+<script src="site.js?v=4"></script>
+<script src="anim-data.js?v=2"></script>
+<script src="anim.js?v=3"></script>
 </body>
 </html>

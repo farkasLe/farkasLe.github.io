@@ -31,38 +31,4 @@
       lift.classList.add('in');
     }
   }
-
-  /* CONE: the poster is the converged frame (25 KB); the 0.56 MB animation loads on click.
-     Every swap fetches and decodes the next image off-screen first, so the current image
-     stays up until the new one is ready -- swapping src directly left a blank box. */
-  function ready(src, done, fail){
-    var pre = new Image(), fired = false;
-    function once(){ if (!fired) { fired = true; done(); } }
-    pre.onload = function(){
-      // decode() can wait indefinitely in a background tab; never hold the swap past 1.5 s
-      if (pre.decode) { pre.decode().then(once, once); setTimeout(once, 1500); } else { once(); }
-    };
-    pre.onerror = fail;
-    pre.src = src;
-  }
-  document.querySelectorAll('.cone-play').forEach(function(b){
-    var img = b.querySelector('img'), badge = b.querySelector('.cone-badge');
-    var PLAY = '▶ Play the 700 runs', STOP = '■ Stop';
-    var busy = false;
-    function set(src, playing){
-      busy = false;
-      img.src = src;
-      b.setAttribute('aria-pressed', playing ? 'true' : 'false');
-      badge.textContent = playing ? STOP : PLAY;
-    }
-    b.addEventListener('click', function(){
-      if (busy) return;
-      busy = true;
-      var playing = b.getAttribute('aria-pressed') === 'true';
-      var next = playing ? b.dataset.poster : b.dataset.anim;
-      if (!playing) badge.textContent = 'Loading…';
-      ready(next, function(){ set(next, !playing); },
-                  function(){ busy = false; badge.textContent = playing ? STOP : PLAY; });
-    });
-  });
 })();
