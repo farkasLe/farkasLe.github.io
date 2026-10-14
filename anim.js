@@ -136,7 +136,7 @@
       captions: [
         'Bags are sold as a menu. Raise one price, and shoppers switch tiers or skip the bag.',
         'Shoppers watch the 20 kg price closely, others barely. Ours marks up where attention is low; rule tables keep equal gaps.',
-        'In a randomized field test, baggage revenue rose 7.8% while the average price fell.'
+        'Randomized field test: revenue rose 7.8%, about the same as the incumbent rule, at a lower average posted price.'
       ],
       render: function(t){
         // the problem: the menu, its shoppers; then the 20 kg price rises and three leave it
